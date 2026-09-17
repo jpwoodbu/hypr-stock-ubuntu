@@ -19,13 +19,15 @@ recommend trying out [Omarchy](https://omarchy.org/).
 ## Quick Start
 
 ```sh
-sudo apt install hyprland hypridle hyprlock hyprpaper hyprpolkitagent waybar \
-  wofi swayosd foot wlsunset jq
+sudo apt install hyprland hypridle hyprlock hyprpaper hyprpolkitagent \
+  hyprpicker waybar wofi swayosd foot wlsunset jq fonts-font-awesome \
+  brightnessctl playerctl
 ```
 
 TODO: Instructions for cloning the repo and copying files into their proper places.
 TODO: Instructions for editing files in /etc
 TODO: Make sure to comment to try the SUPER + K combo to see all the keybindings.
+TODO: Callout the google-calendar.desktop file needing to be created for the clock on-click.
 
 ## Walkthrough
 
@@ -38,12 +40,16 @@ This section explains each package installed and what it does.
 | `hyprlock` | Screen-lock app. It locks the session and displays an authentication prompt to unlock it. |
 | `hyprpaper` | Manages the background wallpaper. |
 | `hyprpolkitagent` | Shows an authentication pop-up dialog box when root privilege is needed. |
+| `hyprpicker` | Used with key binding for copying pixel hex colors. |
 | `waybar` | Displays a status bar across the top of the screen. |
 | `wofi` | Displays menus for things like launching applications. |
 | `swayosd` | Shows an on-screen-display for things like brightness and volume. |
 | `foot` | Terminal program which works well with Hyprland; e.g. no title bar. |
 | `wlsunset` | Changes the color temperature of the display; i.e. a night light. |
 | `jq` | Parses the output from Hyprland tools inside some of the included scripts. |
+| `fonts-font-awesome` | Provides icons for Waybar and the system menu. |
+| `brightnessctl` | Used with key bindings to controls display brightness. |
+| `playerctl` | Used with key bindings to controls media player. |
 
 ## Screenshots
 
