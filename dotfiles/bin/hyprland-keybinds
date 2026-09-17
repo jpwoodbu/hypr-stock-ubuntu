@@ -1,0 +1,304 @@
+#!/usr/bin/env python3
+"""Searchable keybindings menu & command palette for Hyprland using wofi.
+
+Inspired by Omarchy's omarchy-menu-keybindings.
+"""
+
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+from dataclasses import dataclass
+
+
+KEY_MAP = {
+    "mouse:272": "LMB (Drag)",
+    "mouse:273": "RMB (Drag)",
+    "mouse_up": "Scroll Up",
+    "mouse_down": "Scroll Down",
+    "Return": "Enter",
+    "BackSpace": "Backspace",
+    "SPACE": "Space",
+    "left": "Left",
+    "right": "Right",
+    "up": "Up",
+    "down": "Down",
+    "XF86AudioRaiseVolume": "Volume Up",
+    "XF86AudioLowerVolume": "Volume Down",
+    "XF86AudioMute": "Mute",
+    "XF86AudioMicMute": "Mic Mute",
+    "XF86MonBrightnessUp": "Brightness Up",
+    "XF86MonBrightnessDown": "Brightness Down",
+    "XF86AudioNext": "Media Next",
+    "XF86AudioPrev": "Media Prev",
+    "XF86AudioPlay": "Media Play",
+    "XF86AudioPause": "Media Pause",
+}
+
+
+@dataclass(frozen=True)
+class Keybind:
+    chord: str
+    desc: str
+    dispatcher: str
+    arg: str
+    mouse: bool
+    prio: float
+
+    @property
+    def display_line(self) -> str:
+        """Format the key chord and description into a monospace-aligned row."""
+        # 27 chars provides exact vertical column alignment for monospace fonts
+        return f"{self.chord:<27} →  {self.desc}"
+
+
+def get_chord(modmask: int, key: str) -> str:
+    """Decode a modifier bitmask and key identifier into a readable chord string.
+
+    Args:
+        modmask: Integer bitmask representing active modifier keys (e.g. 64 for SUPER).
+        key: Raw key identifier from Hyprland (e.g. 'Return', 'XF86AudioMute').
+
+    Returns:
+        Formatted key combination string (e.g. 'SUPER + SHIFT + Enter').
+    """
+    mods = []
+    if modmask & 64:
+        mods.append("SUPER")
+    if modmask & 4:
+        mods.append("CTRL")
+    if modmask & 8:
+        mods.append("ALT")
+    if modmask & 1:
+        mods.append("SHIFT")
+    k = KEY_MAP.get(key, key)
+    return " + ".join(mods + [k]) if mods else k
+
+
+def get_prio(desc: str) -> float:
+    """Compute a sorting priority for a keybinding description.
+
+    Lower priority numbers appear earlier in the menu list. Categories are
+    ordered as follows:
+      1-5: Primary applications & launchers (Terminal, Browser, Files, Menu)
+      6-8: System tools (Keybindings cheatsheet, Lock screen, Color picker)
+      9-15: Window management & navigation (Close, Float, Fullscreen, Splits, Focus)
+      16-17: Workspaces & workspace switching
+      18-20: Scratchpad & window layout adjustments
+      25: General unclassified keybinds
+      30: Hardware keys (Volume, Brightness, Media playback)
+
+    Args:
+        desc: Descriptive text of the keybinding action.
+
+    Returns:
+        Floating-point priority value used for sorting.
+    """
+    # The second value in the tuple needs to be a float because some entries
+    # will be inserted into the list between other elements.
+    patterns: list[tuple[str, float]] = [
+        (r"(?i)Terminal", 1),
+        (r"(?i)Browser", 2),
+        (r"(?i)File manager", 3),
+        (r"(?i)Application menu", 4),
+        (r"(?i)System menu", 5),
+        (r"(?i)keybinding", 6),
+        (r"(?i)Lock screen", 7),
+        (r"(?i)Color picker", 8),
+        (r"(?i)Close active window", 9),
+        (r"(?i)Toggle floating|Pop out", 10),
+        (r"(?i)fullscreen|maximize", 11),
+        (r"(?i)split|pseudo", 12),
+        (r"(?i)Focus (next|previous)", 13),
+        (r"(?i)borders|Waybar|night", 14),
+        (r"(?i)Move focus", 15),
+    ]
+    for i in range(1, 11):
+        patterns.append((rf"^Workspace {i}$", 16 + i * 0.01))
+        patterns.append((rf"^Move to workspace {i}$", 17 + i * 0.01))
+    patterns.extend([
+        (r"(?i)scratchpad", 18),
+        (r"(?i)Move window|Resize window", 19),
+        (r"(?i)workspace", 20),
+        (r"(?i)Volume|Mute|Brightness|track|Play", 30),
+    ])
+    for pat, prio in patterns:
+        if re.search(pat, desc):
+            return prio
+    # Return 25.0 as a fallback for unclassified keybindings.  This
+    # ensures they appear after primary categories (1-20) but before
+    # hardware-specific keys (30).
+    return 25.0
+
+
+def load_keybinds() -> list[Keybind]:
+    """Load bindings via Hyprland IPC.
+
+    Queries `hyprctl binds -j` for all registered keybindings, filters out
+    secondary helper dispatchers (such as `bringactivetotop` which mirrors
+    `cyclenext`), deduplicates entries with identical chords and descriptions,
+    and returns the list sorted by category priority and key chord.
+
+    Returns:
+        List of unique, prioritized Keybind objects.
+    """
+    try:
+        raw = json.loads(subprocess.check_output(["hyprctl", "binds", "-j"]))
+    except Exception as e:
+        print(f"Error querying hyprctl binds: {e}", file=sys.stderr)
+        return []
+
+    items = []
+    seen = set()
+
+    for b in raw:
+        disp = b.get("dispatcher", "")
+        # Filter out secondary helper dispatchers that duplicate a primary bind
+        if disp == "bringactivetotop":
+            continue
+
+        chord = get_chord(b.get("modmask", 0), b.get("key", ""))
+        desc = b.get("description", "")
+        arg = b.get("arg", "")
+        if not desc:
+            desc = arg if disp == "exec" else f"{disp} {arg}".strip()
+
+        key_id = (chord, desc)
+        if key_id in seen:
+            continue
+        seen.add(key_id)
+
+        items.append(
+            Keybind(
+                chord=chord,
+                desc=desc,
+                dispatcher=disp,
+                arg=arg,
+                mouse=b.get("mouse", False),
+                prio=get_prio(desc),
+            )
+        )
+
+    items.sort(key=lambda x: (x.prio, x.chord))
+    return items
+
+
+def execute_keybind(bind: Keybind) -> None:
+    """Trigger the compositor action corresponding to a selected Keybind.
+
+    Mouse-drag actions (like resizing or moving windows via pointer drag) are
+    skipped since they require active cursor motion. For window-targeting
+    actions, a short 50ms pause is introduced to ensure Wofi's layer-shell
+    surface has cleanly unmapped and Hyprland has refocused the underlying
+    window.
+
+    Args:
+        bind: The Keybind instance to execute.
+    """
+    # Mouse-drag actions require physical cursor motion and cannot be triggered
+    # via key press
+    if bind.mouse:
+        return
+
+    # Brief pause (50ms) to allow Wofi's layer-surface to unmap
+    # and compositor focus to settle back onto the active client window.
+    time.sleep(0.05)
+
+    if bind.dispatcher == "cyclenext":
+        cmd = ["hyprctl", "dispatch", "cyclenext"]
+        if bind.arg:
+            cmd.append(bind.arg)
+        subprocess.run(cmd)
+        subprocess.run(["hyprctl", "dispatch", "bringactivetotop"])
+    else:
+        cmd = ["hyprctl", "dispatch", bind.dispatcher]
+        if bind.arg:
+            cmd.append(bind.arg)
+        subprocess.run(cmd)
+
+
+def main() -> None:
+    """Run the keybindings menu or print the cheatsheet to standard output.
+
+    Supports `--print` or `-p` to output the formatted cheatsheet without
+    launching Wofi. If launched interactively when Wofi is already running,
+    it acts as a toggle and terminates the active Wofi instance. Otherwise,
+    it displays the keybindings in Wofi and executes any selected action.
+    """
+    print_mode = any(arg in sys.argv[1:] for arg in ("--print", "-p"))
+
+    if not print_mode:
+        # Toggle behavior: if wofi is already running, close it
+        if (
+            subprocess.run(
+                ["pidof", "wofi"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            ).returncode
+            == 0
+        ):
+            subprocess.run(
+                ["killall", "wofi"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            sys.exit(0)
+
+    binds = load_keybinds()
+    if not binds:
+        sys.exit(1)
+
+    if print_mode:
+        for b in binds:
+            print(b.display_line)
+        sys.exit(0)
+
+    binds_by_display = {b.display_line: b for b in binds}
+    menu_input = "\n".join(b.display_line for b in binds) + "\n"
+
+    wofi_cmd = ["wofi", "--dmenu"]
+    css_path = Path.home() / ".config/wofi/keybinds.css"
+    if css_path.exists():
+        wofi_cmd.extend(["--style", str(css_path)])
+
+    wofi_cmd.extend([
+        "--prompt", "Keybindings",
+        "--location", "center",
+        "--width", "50%",
+        "--insensitive",
+        "--no-custom-entry",
+    ])
+
+    try:
+        result = subprocess.run(
+            wofi_cmd,
+            input=menu_input,
+            # Setting the CWD to the dir with the style sheets is required for
+            # relative imports in the CSS files themselves.
+            cwd=css_path.parent if css_path.parent.is_dir() else None,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+    except Exception as e:
+        print(f"Error launching wofi: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    if result.returncode != 0:
+        # User cancelled (e.g. Esc or clicked outside)
+        sys.exit(0)
+
+    selected = result.stdout.strip()
+    if not selected:
+        sys.exit(0)
+
+    bind = binds_by_display.get(selected)
+    if bind:
+        execute_keybind(bind)
+
+
+
+if __name__ == "__main__":
+    main()

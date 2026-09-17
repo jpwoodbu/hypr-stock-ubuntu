@@ -1,0 +1,106 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "spacing": 0,
+
+    "modules-left": [
+        "hyprland/workspaces"
+    ],
+    "modules-center": [
+        "clock"
+    ],
+    "modules-right": [
+        "tray",
+        "pulseaudio",
+        "custom/nightlight",
+        "power-profiles-daemon",
+        "bluetooth",
+        "network",
+        "battery",
+        "privacy"
+    ],
+
+    "hyprland/workspaces": {
+        "format": "",
+        "persistent-workspaces": {
+            "*": 4
+        },
+        "on-scroll-up": "hyprctl dispatch workspace e-1",
+        "on-scroll-down": "hyprctl dispatch workspace e+1"
+    },
+
+    "clock": {
+        "format": "{:%a %b %d  %H:%M}",
+        "tooltip": false,
+        "on-click": "gtk-launch google-calendar.desktop"
+    },
+
+    "tray": {
+        "icon-size": 18,
+        "spacing": 10
+    },
+
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-bluetooth": "{icon}",
+        "format-muted": "",
+        "format-icons": {
+            "default": ["", "", ""]
+        },
+        "on-click": "env XDG_CURRENT_DESKTOP=GNOME gnome-control-center sound",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "tooltip-format": "Volume: {volume}%"
+    },
+
+    "network": {
+        "format-wifi": "",
+        "format-ethernet": "",
+        "format-disconnected": "",
+        "tooltip-format": "{essid} ({signalStrength}%)",
+        "on-click": "env XDG_CURRENT_DESKTOP=GNOME gnome-control-center wifi || env XDG_CURRENT_DESKTOP=GNOME gnome-control-center network"
+    },
+
+    "bluetooth": {
+        "format": "",
+        "format-disabled": "",
+        "format-off": "",
+        "format-connected": "",
+        "tooltip-format": "{controller_alias}\t{controller_address}",
+        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}"
+    },
+
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": " {icon} {capacity}%",
+        "format-plugged": " {icon} {capacity}%",
+        "format-icons": ["", "", "", "", ""],
+        "on-click": "env XDG_CURRENT_DESKTOP=GNOME gnome-control-center power"
+    },
+
+    "power-profiles-daemon": {
+        "format": "{icon}",
+        "tooltip-format": "Power profile: {profile}",
+        "tooltip": true,
+        "format-icons": {
+            "default": "",
+            "performance": "",
+            "balanced": "",
+            "power-saver": ""
+        }
+    },
+
+    "custom/nightlight": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.local/bin/nightlight-status",
+        "on-click": "~/.local/bin/nightlight-toggle",
+        "signal": 8,
+        "tooltip": true
+    }
+}

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# Toggle window pop-out (centered, pinned 80% floating modal) for Hyprland.
+#
+# Replicates Omarchy's SUPER + O window popping behavior. When a window is
+# tiled, it floats, resizes to 80% x 80% (leaving 10% margins on all sides),
+# centers within the usable screen area, and pins across workspaces. When
+# already popped/floating, it cleanly unpins and returns the window to the
+# tiled layout without disturbing the tiling split ratios.
+
+set -euo pipefail
+
+# Query the active window's floating and pinned states via Hyprland IPC.
+read -r is_floating is_pinned < <(
+    hyprctl activewindow -j | jq -r '[.floating, .pinned] | @tsv'
+)
+
+# Exit gracefully if no window is active.
+if [[ -z "$is_floating" || "$is_floating" == "null" ]]; then
+    exit 0
+fi
+
+if [[ "$is_floating" == "true" ]]; then
+    # Window is currently popped/floating: unpin and return to tiled mode.
+    if [[ "$is_pinned" == "true" ]]; then
+        hyprctl dispatch pin
+    fi
+    hyprctl dispatch settiled
+else
+    # Window is tiled: float, resize to 80%x80%, center (respecting bar), and
+    # pin
+    hyprctl --batch "dispatch setfloating ; dispatch resizeactive exact 80% 80% ; dispatch centerwindow 1 ; dispatch pin"
+fi

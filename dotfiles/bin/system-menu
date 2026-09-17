@@ -1,0 +1,43 @@
+#!/bin/bash
+# system-menu: Keyboard-driven system power menu for Hyprland using wofi
+
+# Toggle behavior: if wofi is already running, close it
+if pidof wofi >/dev/null 2>&1; then
+    killall wofi
+    exit 0
+fi
+
+# Define options with clean icons
+options="  Lock
+  Suspend
+  Log Out
+  Reboot
+  Shut Down"
+
+# Launch wofi in dmenu mode with a compact, centered layout
+choice=$(echo -e "$options" | wofi --dmenu \
+    --hide-search \
+    --width 200 \
+    --height 237 \
+    --location center \
+    --hide-scroll)
+
+case "$choice" in
+    *"Lock"*)
+        # If hyprlock is already running, the session is locked, and running it
+        # again is probably a bad idea.
+        pidof hyprlock || hyprlock
+        ;;
+    *"Suspend"*)
+        systemctl suspend
+        ;;
+    *"Log Out"*)
+        ~/.local/bin/hyprland-logout
+        ;;
+    *"Reboot"*)
+        systemctl reboot
+        ;;
+    *"Shut Down"*)
+        systemctl poweroff
+        ;;
+esac

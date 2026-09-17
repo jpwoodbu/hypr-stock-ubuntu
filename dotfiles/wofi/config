@@ -1,0 +1,14 @@
+width=600
+height=450
+location=center
+prompt=Search...
+filter_rate=100
+allow_images=true
+image_size=32
+insensitive=true
+no_actions=true
+key_expand=Right
+key_down=
+key_up=
+key_forward=Down,Tab
+key_backward=Up,Shift-ISO_Left_Tab

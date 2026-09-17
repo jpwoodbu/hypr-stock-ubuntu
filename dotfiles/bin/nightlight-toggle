@@ -1,0 +1,47 @@
+#!/bin/bash
+# Single source of truth for color temperature
+TEMP=5400
+HIGH_TEMP=$((TEMP + 1))
+STATE_FILE="$HOME/.local/state/nightlight-enabled"
+
+start_nightlight() {
+    if ! pgrep -x wlsunset >/dev/null; then
+        wlsunset -t "$TEMP" -T "$HIGH_TEMP" >/dev/null 2>&1 &
+    fi
+    mkdir -p "$(dirname "$STATE_FILE")"
+    touch "$STATE_FILE"
+}
+
+stop_nightlight() {
+    pkill -x wlsunset 2>/dev/null
+    rm -f "$STATE_FILE"
+}
+
+case "$1" in
+    restore)
+        # Called on login: only start if it was enabled when last used
+        [ -f "$STATE_FILE" ] && start_nightlight
+        ;;
+    on)
+        start_nightlight
+        swayosd-client --custom-message "Night Light: On (${TEMP}K)" --custom-icon "weather-clear-night" 2>/dev/null || true
+        ;;
+    off)
+        stop_nightlight
+        swayosd-client --custom-message "Night Light: Off" --custom-icon "weather-clear" 2>/dev/null || true
+        ;;
+    *)
+        # Normal toggle (keybind or Waybar click)
+        if pgrep -x wlsunset >/dev/null; then
+            stop_nightlight
+            swayosd-client --custom-message "Night Light: Off" --custom-icon "weather-clear" 2>/dev/null || true
+        else
+            start_nightlight
+            swayosd-client --custom-message "Night Light: On (${TEMP}K)" --custom-icon "weather-clear-night" 2>/dev/null || true
+        fi
+        ;;
+esac
+
+# Signal Waybar (via SIGRTMIN+8) to immediately refresh the custom/nightlight
+# icon without polling
+pkill -RTMIN+8 waybar 2>/dev/null || true

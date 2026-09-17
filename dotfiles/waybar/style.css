@@ -1,0 +1,158 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "Ubuntu", "FontAwesome", "Cantarell", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+window#waybar {
+    background-color: #000000;
+    color: #ffffff;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+}
+
+/* Tooltip & Calendar */
+tooltip {
+    background-color: #1e1e1e;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+tooltip label {
+    font-family: "Ubuntu Mono", monospace;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+/* Left: Workspace Indicator (Ubuntu 24.04 / 26.04 GNOME style) */
+#workspaces {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 17px;
+    margin: 4px 6px;
+    padding: 0 4px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+#workspaces:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+#workspaces button {
+    min-width: 9px;
+    min-height: 9px;
+    padding: 0;
+    margin: 0 4px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: none;
+    text-shadow: none;
+    transition: all 0.2s ease-in-out;
+}
+
+#workspaces button label {
+    font-size: 0px;
+    padding: 0;
+    margin: 0;
+}
+
+#workspaces button.active {
+    min-width: 26px;
+    background-color: #ffffff;
+    border-radius: 5px;
+}
+
+#workspaces button:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+#workspaces button.urgent {
+    background-color: #f66151;
+}
+
+/* Center: Clock */
+#clock {
+    padding: 0 16px;
+    margin: 4px 0;
+    border-radius: 17px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+#clock:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Right: Quick Settings Pill */
+#tray {
+    padding: 0 10px;
+    margin-right: 6px;
+}
+
+#pulseaudio,
+#network,
+#battery,
+#power-profiles-daemon,
+#custom-nightlight,
+#bluetooth {
+    padding: 0 10px;
+    margin: 4px 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+#bluetooth.off,
+#bluetooth.disabled {
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+}
+
+#custom-nightlight.active {
+    color: #ffbe6f;
+}
+
+#custom-nightlight.inactive {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+#network.disconnected {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+#pulseaudio.muted {
+    color: #f66151;
+}
+
+#pulseaudio {
+    margin-left: 6px;
+    border-top-left-radius: 17px;
+    border-bottom-left-radius: 17px;
+}
+
+#battery {
+    margin-right: 6px;
+    padding-right: 14px;
+    border-top-right-radius: 17px;
+    border-bottom-right-radius: 17px;
+}
+
+#battery.warning:not(.charging) {
+    color: #f6d32d;
+}
+
+#battery.critical:not(.charging) {
+    color: #f66151;
+}
+
+#pulseaudio:hover,
+#network:hover,
+#battery:hover,
+#power-profiles-daemon:hover,
+#custom-nightlight:hover,
+#bluetooth:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+

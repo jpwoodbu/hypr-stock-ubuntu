@@ -1,0 +1,7 @@
+@import "style.css";
+
+#text {
+    /* Use monospace font for pixel-perfect vertical column alignment */
+    font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-size: 17px;
+}

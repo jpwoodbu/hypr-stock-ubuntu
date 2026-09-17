@@ -1,0 +1,38 @@
+#window {
+    background-color: #1e1e1e;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    font-family: "Ubuntu", "Cantarell", "FontAwesome", sans-serif;
+}
+
+#scroll {
+    margin: 16px 0px;
+}
+
+#input {
+    /* 0px margin on the bottom of the input element becauase the scroll section
+     * directly below already has a top/bottom margin. */
+    margin: 16px 16px 0px 16px;
+    padding: 10px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    background-color: #2b2b2b;
+    font-size: 18px;
+}
+
+#entry {
+    padding: 8px 12px;
+    margin: 2px 16px;
+    outline: none;
+}
+
+#entry:selected {
+    background-color: #3584e4;
+    color: #ffffff;
+    border-radius: 10px;
+}
+
+#text {
+    margin-left: 12px;
+    font-size: 18px;
+}
