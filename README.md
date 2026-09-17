@@ -14,7 +14,8 @@ disrupting your existing setup. And since the included config and scripts are
 small, it should be easy to see how it works and further customize it.
 
 If you really like Hyprland and want to use it in a first class sort of way, I
-recommend trying out [Omarchy](https://omarchy.org/).
+recommend trying out [Omarchy](https://omarchy.org/), although I think this
+setup is good enough for me to use for the long term.
 
 ## Quick Start
 
@@ -92,7 +93,7 @@ use Hyprland the less likely that seems). I want to be able to switch back and
 forth between Hyprland and GNOME sessions and I expect others, also new to
 Hyprland, may want that too.
 
-### Why use Omarchy hotkeys
+### Why use Omarchy hotkeys?
 
 I think their [hotkeys](https://omarchy.org/manual/hotkeys/) are
 well-thought-out. Since I might end up eventually switching to Omarchy, it makes
