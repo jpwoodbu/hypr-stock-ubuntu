@@ -32,6 +32,8 @@ git clone https://github.com/jpwoodbu/hypr-stock-ubuntu.git
 Copy the files into their canonical paths:
 ```sh
 cd hypr-stock-ubuntu/dotfiles
+mkdir -p ~/.local/bin
+mkdir -p ~/.config
 cp -i bin/* ~/.local/bin
 cp -ir foot hypr waybar wofi ~/.config
 ```
