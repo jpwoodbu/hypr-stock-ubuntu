@@ -13,6 +13,20 @@ This guide aims to make it trivial to try out Hyprland on Ubuntu without
 disrupting your existing setup. And since the included config and scripts are
 small, it should be easy to see how it works and further customize it.
 
+Other ways to get Hyprland running on Ubuntu worth considering:
+
+| Approach | Package Source | Coexistence with stock setup | Relative Footprint |
+| :--- | :--- | :--- | :--- |
+| [JaKooLit](https://github.com/JaKooLit/Ubuntu-Hyprland) | PPAs + GitHub releases | ❌ Severe breakage risk | Large |
+| Community PPAs*| PPAs | ⚠️ Moderate risk | Varies |
+| Source compile | Built yourself | ⚠️ Library collision risk | Large** |
+| Nix on Ubuntu | Nix flake / built yourself | ✅ No risk | Large
+| **hypr-stock-ubuntu** | Stock Ubuntu | ✅ No risk | Small |
+
+_*Not needed with Ubuntu 26.04, but included for historical comparison._
+
+_**Large if you include the footprint for running the build._
+
 If you really like Hyprland and want to use it in a first-class sort of way, I
 recommend trying out [Omarchy](https://omarchy.org/), although I think this
 setup is good enough for me to use for the long term.
