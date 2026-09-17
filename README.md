@@ -105,7 +105,7 @@ Clicking on the clock in the status bar will try to open Google Calendar by
 running `gtk-launch google-calendar.desktop`. That works for me because I
 clicked the button in Chrome to install Google Calendar while having it loaded
 in a browser tab. I then went into `~/.local/share/applications` and renamed the
-`.desktop` files Chrome created to `google-calendar.desktop`.
+`.desktop` file Chrome created to `google-calendar.desktop`.
 
 ## Screenshots
 
