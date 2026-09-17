@@ -25,8 +25,11 @@ sudo apt install hyprland hypridle hyprlock hyprpaper hyprpolkitagent \
 ```
 
 TODO: Instructions for cloning the repo and copying files into their proper places.
+
 TODO: Instructions for editing files in /etc
+
 TODO: Make sure to comment to try the SUPER + K combo to see all the keybindings.
+
 TODO: Callout the google-calendar.desktop file needing to be created for the clock on-click.
 
 ## Walkthrough
@@ -99,3 +102,7 @@ sense to stick to (a subset of) their bindings.
 
 Most likely, I've not yet needed it so I haven't added it. I plan to eventually
 migrate every hotkey from Omarchy that is generally compatible with this setup.
+
+### Why not use Universal Wayland Session Manager?
+
+TODO: fill in
