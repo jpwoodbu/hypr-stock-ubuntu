@@ -7,7 +7,7 @@ This is a guide for setting up [Hyprland](https://hypr.land/) on
 * Non-invasive: Coexist with the already installed desktop environment
 * Inspectable: Small config files and scripts
 * Low surface area: Configs only in your homedir with minimal exceptions
-* [Omarchy](https://omarchy.org/) hotkeys: Use the same key bindings as Omarchy
+* [Omarchy](https://omarchy.org/) hotkeys: Use the same keybindings as Omarchy
 
 This guide aims to make it trivial to try out Hyprland on Ubuntu without
 disrupting your existing setup. And since the included config and scripts are
@@ -22,7 +22,7 @@ setup is good enough for me to use for the long term.
 ```sh
 sudo apt install hyprland hypridle hyprlock hyprpaper hyprpolkitagent \
   hyprpicker waybar wofi swayosd foot wlsunset jq fonts-font-awesome \
-  brightnessctl playerctl
+  brightnessctl playerctl wl-clipboard
 ```
 
 TODO: Instructions for cloning the repo and copying files into their proper places.
@@ -44,7 +44,7 @@ This section explains each package installed and what it does.
 | `hyprlock` | Screen-lock app. It locks the session and displays an authentication prompt to unlock it. |
 | `hyprpaper` | Manages the background wallpaper. |
 | `hyprpolkitagent` | Shows an authentication pop-up dialog box when root privilege is needed. |
-| `hyprpicker` | Used with key binding for copying pixel hex colors. |
+| `hyprpicker` | Used with keybinding for copying pixel hex colors. |
 | `waybar` | Displays a status bar across the top of the screen. |
 | `wofi` | Displays menus for things like launching applications. |
 | `swayosd` | Shows an on-screen-display for things like brightness and volume. |
@@ -52,8 +52,9 @@ This section explains each package installed and what it does.
 | `wlsunset` | Changes the color temperature of the display; i.e. a night light. |
 | `jq` | Parses the output from Hyprland tools inside some of the included scripts. |
 | `fonts-font-awesome` | Provides icons for Waybar and the system menu. |
-| `brightnessctl` | Used with key bindings to controls display brightness. |
-| `playerctl` | Used with key bindings to controls media player. |
+| `brightnessctl` | Used with keybindings to controls display brightness. |
+| `playerctl` | Used with keybindings to controls media player. |
+| `wl-clipboard` | Wayland clipboard CLI. Used with the screenshot keybinding. |
 
 ## Screenshots
 
