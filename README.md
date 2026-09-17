@@ -159,6 +159,7 @@ do not work when in a Hyprland session.
 * [Why use Omarchy hotkeys?](#why-use-omarchy-hotkeys)
 * [Why is $x Omarchy hotkey missing?](#why-is-x-omarchy-hotkey-missing)
 * [Why not use Universal Wayland Session Manager?](#why-not-use-universal-wayland-session-manager)
+* [Why are you opening the GNOME control center from the Waybar?](#why-are-you-opening-the-gnome-control-center-from-the-waybar)
 
 ### Why Hyprland?
 
@@ -200,3 +201,9 @@ It also didn't fully address the problem I was hoping it would: graceful logout.
 Calling `uwsm stop` alone doesn't give applications enough time (e.g. Chrome)
 before the Wayland socket drops. A dedicated logout script was still necessary.
 This is something GNOME has issues with too, at least for Chrome.
+
+### Why are you opening the GNOME control center from the Waybar?
+
+It was easy and functional aside from the Bluetooth controls, which I don't
+usually need. A _Quick Controls_ style widget like GNOME has would be neat, but
+I've not yet looked into it.
