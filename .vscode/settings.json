@@ -1,12 +1,14 @@
 {
     "cSpell.words": [
         "brightnessctl",
+        "Holdoff",
         "hypr",
         "hypridle",
         "hyprlock",
         "hyprpaper",
         "hyprpicker",
         "hyprpolkitagent",
+        "logind",
         "playerctl",
         "swayosd",
         "waybar",
