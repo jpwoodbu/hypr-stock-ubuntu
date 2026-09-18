@@ -35,17 +35,18 @@ setup is good enough for me to use for the long term.
 
 Install the packages:
 ```sh
-sudo apt update && sudo apt install hyprland hypridle hyprlock hyprpaper hyprpolkitagent hyprpicker waybar wofi swayosd foot wlsunset jq fonts-font-awesome brightnessctl playerctl wl-clipboard git
+sudo apt update && sudo apt install hyprland hypridle hyprlock hyprpaper hyprpolkitagent hyprpicker waybar wofi swayosd foot wlsunset jq fonts-font-awesome brightnessctl playerctl wl-clipboard
 ```
 
-Clone this repo to bring in copies of the needed config files and scripts:
+Download and extract the latest **hypr-stock-ubuntu** dotfiles release:
 ```sh
-git clone https://github.com/jpwoodbu/hypr-stock-ubuntu.git
+wget https://github.com/jpwoodbu/hypr-stock-ubuntu/releases/latest/download/hypr-stock-ubuntu-dotfiles.tgz
+tar -xzf hypr-stock-ubuntu-dotfiles.tgz
 ```
 
 Copy the files into their canonical paths:
 ```sh
-cd hypr-stock-ubuntu/dotfiles
+cd dotfiles
 mkdir -p ~/.local/bin
 mkdir -p ~/.config
 cp -i bin/* ~/.local/bin
@@ -90,7 +91,6 @@ in the bottom right. The first thing you should do when logging in is try the
 | `brightnessctl` | Used with keybindings to control display brightness. |
 | `playerctl` | Used with keybindings to control media playback. |
 | `wl-clipboard` | Wayland clipboard CLI. Used with the screenshot keybinding. |
-| `git` | Only needed to clone this repo. |
 
 ## Scripts and how each one is used
 

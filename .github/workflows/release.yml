@@ -1,0 +1,47 @@
+name: Release Dotfiles
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release tag
+        id: vars
+        run: |
+          TAG_NAME="v$(date -u +'%Y.%m.%d')-${{ github.run_number }}"
+          echo "tag=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Create dotfiles archive
+        env:
+          TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          cat <<EOF > dotfiles/VERSION
+          Release: ${TAG}
+          Commit: ${{ github.sha }}
+          Date: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+          EOF
+          tar -czf hypr-stock-ubuntu-dotfiles.tgz dotfiles
+          ls -lh hypr-stock-ubuntu-dotfiles.tgz
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          gh release create "$TAG" hypr-stock-ubuntu-dotfiles.tgz \
+            --target "${{ github.sha }}" \
+            --title "$TAG" \
+            --generate-notes
