@@ -6,28 +6,53 @@
 # tiled, it floats, resizes to 80% x 80% (leaving 10% margins on all sides),
 # centers within the usable screen area, and pins across workspaces. When
 # already popped/floating, it cleanly unpins and returns the window to the
-# tiled layout without disturbing the tiling split ratios.
+# tiled layout without disturbing the tiling split ratios or split orientation.
+#
 
 set -euo pipefail
 
-# Query the active window's floating and pinned states via Hyprland IPC.
-read -r is_floating is_pinned < <(
-    hyprctl activewindow -j | jq -r '[.floating, .pinned] | @tsv'
-)
+# Query the active window info via Hyprland IPC
+window_json=$(hyprctl activewindow -j)
 
-# Exit gracefully if no window is active.
-if [[ -z "$is_floating" || "$is_floating" == "null" ]]; then
+# Exit gracefully if no window is active
+if [[ -z "$window_json" || "$window_json" == "{}" ]]; then
     exit 0
 fi
 
+read -r address is_floating is_pinned width height ws_id < <(
+    echo "$window_json" | jq -r '[.address, .floating, .pinned, .size[0], .size[1], .workspace.id] | @tsv'
+)
+
+if [[ -z "$address" || "$address" == "null" ]]; then
+    exit 0
+fi
+
+state_file="/tmp/hypr-pop-${address}.split"
+
 if [[ "$is_floating" == "true" ]]; then
-    # Window is currently popped/floating: unpin and return to tiled mode.
+    # Window is currently popped/floating: unpin and return to tiled mode
+    batch="dispatch settiled"
     if [[ "$is_pinned" == "true" ]]; then
-        hyprctl dispatch pin
+        batch="dispatch pin ; $batch"
     fi
-    hyprctl dispatch settiled
+    # If the window was previously in a horizontal (top/bottom) split, restore it
+    if [[ -f "$state_file" ]]; then
+        batch="$batch ; dispatch togglesplit"
+        rm -f "$state_file" 2>/dev/null || true
+    fi
+    hyprctl --batch "$batch"
 else
-    # Window is tiled: float, resize to 80%x80%, center (respecting bar), and
-    # pin
+    # Check if this window is currently in a horizontal (top/bottom) split with other tiled windows.
+    # In dwindle layout on widescreen displays:
+    # - side-by-side windows have width < height (columns)
+    # - top-and-bottom windows have width > height (rows)
+    tiled_count=$(hyprctl clients -j | jq "[.[] | select(.workspace.id == $ws_id and .floating == false)] | length")
+    if (( tiled_count >= 2 && width > height )); then
+        touch "$state_file"
+    else
+        rm -f "$state_file" 2>/dev/null || true
+    fi
+
+    # Window is tiled: float, resize to 80%x80%, center (respecting bar), and pin
     hyprctl --batch "dispatch setfloating ; dispatch resizeactive exact 80% 80% ; dispatch centerwindow 1 ; dispatch pin"
 fi
