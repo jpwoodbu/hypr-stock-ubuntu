@@ -1,47 +1,80 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Control wlsunset color temperature + status output for Waybar.
+# Usage: nightlight-toggle [restore|on|off|status]  (no arg = toggle)
+
+set -euo pipefail
+
 # Single source of truth for color temperature
 TEMP=5400
-HIGH_TEMP=$((TEMP + 1))
+# wlsunset requires daytime temp (-T) to be greater than nighttime (-t).
+DAYTIME_TEMP=$((TEMP + 1))
+# A state file is needed to remember between sessions whether the nightlight was
+# last enabled.
 STATE_FILE="$HOME/.local/state/nightlight-enabled"
 
+is_enabled() {
+    pgrep -x wlsunset >/dev/null
+}
+
+print_status() {
+    if is_enabled; then
+        echo '{"text": "", "class": "active", "tooltip": "Night Light: enabled"}'
+    else
+        echo '{"text": "", "class": "inactive", "tooltip": "Night Light: disabled"}'
+    fi
+}
+
+notify() {
+    swayosd-client --custom-message "$1" --custom-icon "$2" 2>/dev/null || true
+}
+
 start_nightlight() {
-    if ! pgrep -x wlsunset >/dev/null; then
-        wlsunset -t "$TEMP" -T "$HIGH_TEMP" >/dev/null 2>&1 &
+    if ! is_enabled; then
+        wlsunset -t "$TEMP" -T "$DAYTIME_TEMP" >/dev/null 2>&1 &
     fi
     mkdir -p "$(dirname "$STATE_FILE")"
     touch "$STATE_FILE"
 }
 
 stop_nightlight() {
-    pkill -x wlsunset 2>/dev/null
+    pkill -x wlsunset 2>/dev/null || true
     rm -f "$STATE_FILE"
 }
 
-case "$1" in
+case "${1:-}" in
+    status)
+        print_status
+        # Exit early to avoid the pkill command at the bottom of the script from
+        # telling Waybar to refresh the nightlight icon which would run this
+        # status case in a loop.
+        exit 0
+        ;;
     restore)
-        # Called on login: only start if it was enabled when last used
-        [ -f "$STATE_FILE" ] && start_nightlight
+        # Called on login. Only start if it was enabled when last used.
+        if [ -f "$STATE_FILE" ]; then
+            start_nightlight
+        fi
         ;;
     on)
         start_nightlight
-        swayosd-client --custom-message "Night Light: On (${TEMP}K)" --custom-icon "weather-clear-night" 2>/dev/null || true
+        notify "Night Light: On (${TEMP}K)" "weather-clear-night"
         ;;
     off)
         stop_nightlight
-        swayosd-client --custom-message "Night Light: Off" --custom-icon "weather-clear" 2>/dev/null || true
+        notify "Night Light: Off" "weather-clear"
         ;;
     *)
-        # Normal toggle (keybind or Waybar click)
-        if pgrep -x wlsunset >/dev/null; then
+        # Default to the toggle action.
+        if is_enabled; then
             stop_nightlight
-            swayosd-client --custom-message "Night Light: Off" --custom-icon "weather-clear" 2>/dev/null || true
+            notify "Night Light: Off" "weather-clear"
         else
             start_nightlight
-            swayosd-client --custom-message "Night Light: On (${TEMP}K)" --custom-icon "weather-clear-night" 2>/dev/null || true
+            notify "Night Light: On (${TEMP}K)" "weather-clear-night"
         fi
         ;;
 esac
 
 # Signal Waybar (via SIGRTMIN+8) to immediately refresh the custom/nightlight
-# icon without polling
+# icon without polling.
 pkill -RTMIN+8 waybar 2>/dev/null || true

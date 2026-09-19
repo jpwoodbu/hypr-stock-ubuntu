@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Gracefully signal active Wayland clients, layers, and daemons before exiting
 # Hyprland.
+
+set -euo pipefail
 
 # How many milliseconds to wait for processes to handle a SIGTERM.
 TIMEOUT_MS=2500
@@ -9,26 +11,25 @@ TIMEOUT_MS=2500
 INTERVAL=0.05
 
 # Blank the display immediately for instant, seamless visual feedback
-hyprctl dispatch dpms off 2>/dev/null
+hyprctl dispatch dpms off 2>/dev/null || true
 
-# Collect all active client and layer PIDs recursively from Hyprland IPC
+# Collect all active client and layer PIDs recursively from Hyprland IPC.
+# Each hyprctl/jq stage is failure-tolerant so a dead compositor socket
+# degrades to an empty PID list instead of aborting the logout.
 mapfile -t IPC_PIDS < <(
     {
-        hyprctl clients -j 2>/dev/null
-        hyprctl layers -j 2>/dev/null
-    } | jq -r '.. | .pid? // empty' | sort -u
+        hyprctl clients -j 2>/dev/null || true
+        hyprctl layers -j 2>/dev/null || true
+    } | jq -r '.. | .pid? // empty' 2>/dev/null | sort -u || true
 )
 
-# Combine and filter unique, valid, running PIDs (excluding self)
+# Filter to valid, running PIDs (excluding self).
 TARGET_PIDS=()
 for pid in "${IPC_PIDS[@]}"; do
     if [ -n "$pid" ] && [ "$pid" -gt 0 ] && [ "$pid" -ne "$$" ] && kill -0 "$pid" 2>/dev/null; then
         TARGET_PIDS+=("$pid")
     fi
 done
-
-# Remove duplicates
-mapfile -t TARGET_PIDS < <(printf '%s\n' "${TARGET_PIDS[@]}" | sort -u)
 
 # Send SIGTERM to all target processes
 if [ ${#TARGET_PIDS[@]} -gt 0 ]; then
@@ -63,7 +64,7 @@ if [ ${#TARGET_PIDS[@]} -gt 0 ]; then
 fi
 
 # Stop services cleanly so they don't segfault or rapid-restart on socket loss
-systemctl --user stop hyprpolkitagent.service xdg-desktop-portal-hyprland.service xdg-desktop-portal.service 2>/dev/null
+systemctl --user stop hyprpolkitagent.service xdg-desktop-portal-hyprland.service xdg-desktop-portal.service 2>/dev/null || true
 
 # Terminate Hyprland session
 hyprctl dispatch exit

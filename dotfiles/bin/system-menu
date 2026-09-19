@@ -1,5 +1,7 @@
-#!/bin/bash
-# system-menu: Keyboard-driven system power menu for Hyprland using wofi
+#!/usr/bin/env bash
+# Keyboard-driven system power menu for Hyprland using wofi
+
+set -euo pipefail
 
 # Toggle behavior: if wofi is already running, close it
 if pidof wofi >/dev/null 2>&1; then
@@ -14,13 +16,14 @@ options="  Lock
   Reboot
   Shut Down"
 
-# Launch wofi in dmenu mode with a compact, centered layout
-choice=$(echo -e "$options" | wofi --dmenu \
+# Launch wofi in dmenu mode with a compact, centered layout.
+# Height fits 5 rows without scrolling; update if options change.
+choice=$(printf '%s\n' "$options" | wofi --dmenu \
     --hide-search \
     --width 200 \
     --height 237 \
     --location center \
-    --hide-scroll)
+    --hide-scroll || true)  # cancelling the menu yields a non-zero return code
 
 case "$choice" in
     *"Lock"*)
