@@ -55,10 +55,11 @@ class Keybind:
 
 
 def get_chord(modmask: int, key: str) -> str:
-    """Decode a modifier bitmask and key identifier into a readable chord string.
+    """Decode a modifier bitmask and key into a readable chord string.
 
     Args:
-        modmask: Integer bitmask representing active modifier keys (e.g. 64 for SUPER).
+        modmask: Integer bitmask of active modifier keys (e.g. 64 for
+            SUPER).
         key: Raw key identifier from Hyprland (e.g. 'Return', 'XF86AudioMute').
 
     Returns:
@@ -84,7 +85,8 @@ def get_prio(desc: str) -> float:
     ordered as follows:
       1-5: Primary applications & launchers (Terminal, Browser, Files, Menu)
       6-8: System tools (Keybindings cheatsheet, Lock screen, Color picker)
-      9-15: Window management & navigation (Close, Float, Fullscreen, Splits, Focus)
+      9-15: Window management & navigation (Close, Float, Fullscreen,
+          Splits, Focus)
       16-17: Workspaces & workspace switching
       18-20: Scratchpad & window layout adjustments
       25: General unclassified keybinds

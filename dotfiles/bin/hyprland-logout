@@ -10,7 +10,7 @@ TIMEOUT_MS=2500
 # exited.
 INTERVAL=0.05
 
-# Blank the display immediately for instant, seamless visual feedback
+# Blank the display immediately for instant, seamless visual feedback.
 hyprctl dispatch dpms off 2>/dev/null || true
 
 # Collect all active client and layer PIDs recursively from Hyprland IPC.
@@ -31,11 +31,11 @@ for pid in "${IPC_PIDS[@]}"; do
     fi
 done
 
-# Send SIGTERM to all target processes
+# Send SIGTERM to all target processes.
 if [ ${#TARGET_PIDS[@]} -gt 0 ]; then
     kill -TERM "${TARGET_PIDS[@]}" 2>/dev/null
 
-    # Wait adaptively for processes to exit cleanly
+    # Wait adaptively for processes to exit cleanly.
     start_time=$(date +%s%N)
     timeout_ns=$(( TIMEOUT_MS * 1000000 ))
 
@@ -48,7 +48,7 @@ if [ ${#TARGET_PIDS[@]} -gt 0 ]; then
             fi
         done
 
-        # Exit wait loop immediately if all targets have exited
+        # Exit wait loop immediately if all targets have exited.
         if [ "$still_running" -eq 0 ]; then
             break
         fi
@@ -63,8 +63,8 @@ if [ ${#TARGET_PIDS[@]} -gt 0 ]; then
     done
 fi
 
-# Stop services cleanly so they don't segfault or rapid-restart on socket loss
+# Stop services cleanly so they don't segfault or rapid-restart on socket loss.
 systemctl --user stop hyprpolkitagent.service xdg-desktop-portal-hyprland.service xdg-desktop-portal.service 2>/dev/null || true
 
-# Terminate Hyprland session
+# Terminate Hyprland session.
 hyprctl dispatch exit
