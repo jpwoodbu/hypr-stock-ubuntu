@@ -99,7 +99,7 @@ in the bottom right. The first thing you should do when logging in is try the
 | `hyprland-keybinds` | Shows a dynamic menu of keybindings based on the running Hyprland config. |
 | `hyprland-logout` | Tries to gracefully shutdown session processes in the right order on logout.
 | `hyprland-window-pop` | Manages the logic of popping out windows (`SUPER + O`).
-| `nightlight-toggle` | Toggles the nightlight on/off. Used by the Waybar and in a keybinding.
+| `nightlightctl` | Controls the blue light filter. Used by the Waybar and in a keybinding.
 | `system-menu` | Shows a menu of actions like lock, suspend, reboot, etc.
 
 ## Extras

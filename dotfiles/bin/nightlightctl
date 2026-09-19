@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Control wlsunset color temperature + status output for Waybar.
-# Usage: nightlight-toggle [restore|on|off|status]  (no arg = toggle)
+# Usage: nightlightctl [restore|on|off|status]  (no arg = toggle)
 
 set -euo pipefail
 

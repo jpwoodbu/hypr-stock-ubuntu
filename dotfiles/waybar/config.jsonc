@@ -98,8 +98,8 @@
     "custom/nightlight": {
         "format": "{}",
         "return-type": "json",
-        "exec": "~/.local/bin/nightlight-toggle status",
-        "on-click": "~/.local/bin/nightlight-toggle",
+        "exec": "~/.local/bin/nightlightctl status",
+        "on-click": "~/.local/bin/nightlightctl",
         "signal": 8,
         "tooltip": true
     }
