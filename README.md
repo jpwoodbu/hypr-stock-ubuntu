@@ -91,6 +91,7 @@ in the bottom right. The first thing you should do when logging in is try the
 | `brightnessctl` | Used with keybindings to control display brightness. |
 | `playerctl` | Used with keybindings to control media playback. |
 | `wl-clipboard` | Wayland clipboard CLI. Used with the screenshot keybinding. |
+| `cliphist` | Clipboard manager. Used with the clipboard history keybinding. |
 
 ## Scripts and how each one is used
 
