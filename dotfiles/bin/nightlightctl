@@ -12,8 +12,15 @@ DAYTIME_TEMP=$((TEMP + 1))
 # last enabled.
 STATE_FILE="$HOME/.local/state/nightlight-enabled"
 
-is_enabled() {
+is_running() {
     pgrep -x wlsunset >/dev/null
+}
+
+# The night light is considered enabled if the state file indicates it should be
+# active. This prevents a race condition on login where Waybar queries status
+# before restore finishes launching wlsunset.
+is_enabled() {
+    [ -f "$STATE_FILE" ]
 }
 
 print_status() {
@@ -29,7 +36,7 @@ notify() {
 }
 
 start_nightlight() {
-    if ! is_enabled; then
+    if ! is_running; then
         wlsunset -t "$TEMP" -T "$DAYTIME_TEMP" >/dev/null 2>&1 &
     fi
     mkdir -p "$(dirname "$STATE_FILE")"
@@ -41,27 +48,34 @@ stop_nightlight() {
     rm -f "$STATE_FILE"
 }
 
+update_waybar() {
+    # Signal Waybar (via SIGRTMIN+8) to immediately refresh the
+    # custom/nightlight icon without polling.
+    pkill -RTMIN+8 waybar 2>/dev/null || true
+}
+
 case "${1:-}" in
     status)
         print_status
-        # Exit early to avoid the pkill command at the bottom of the script from
-        # telling Waybar to refresh the nightlight icon which would run this
-        # status case in a loop.
-        exit 0
         ;;
     restore)
         # Called on login. Only start if it was enabled when last used.
-        if [ -f "$STATE_FILE" ]; then
+        if is_enabled; then
             start_nightlight
         fi
+        # Don't call update_waybar here as it might not be ready to handle the
+        # configured signal for updating the nightlight module, and that
+        # unhandled signal has been observed to terminate waybar.
         ;;
     on)
         start_nightlight
         notify "Night Light: On (${TEMP}K)" "weather-clear-night"
+        update_waybar
         ;;
     off)
         stop_nightlight
         notify "Night Light: Off" "weather-clear"
+        update_waybar
         ;;
     *)
         # Default to the toggle action.
@@ -72,9 +86,7 @@ case "${1:-}" in
             start_nightlight
             notify "Night Light: On (${TEMP}K)" "weather-clear-night"
         fi
+        update_waybar
         ;;
 esac
 
-# Signal Waybar (via SIGRTMIN+8) to immediately refresh the custom/nightlight
-# icon without polling.
-pkill -RTMIN+8 waybar 2>/dev/null || true
