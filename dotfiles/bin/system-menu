@@ -9,12 +9,8 @@ if pidof wofi >/dev/null 2>&1; then
     exit 0
 fi
 
-# Define options with clean icons
-options="  Lock
-  Suspend
-  Log Out
-  Reboot
-  Shut Down"
+# Define options with clean icons and tabs for vertical alignment.
+options=$'\tLock\n\tSuspend\n\tLog Out\n\tReboot\n\tShut Down'
 
 # Launch wofi in dmenu mode with a compact, centered layout.
 # Height fits 5 rows without scrolling; update if options change.
