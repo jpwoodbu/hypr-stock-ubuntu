@@ -1,7 +1,7 @@
 # hypr-stock-ubuntu
 
 This is a guide for setting up [Hyprland](https://hypr.land/) on
-[Ubuntu](https://ubuntu.com/) 26.04, made with the following goals:
+[Ubuntu](https://ubuntu.com/) 26.04 LTS, made with the following goals:
 
 - Stock-native: Use only packages from the stock Ubuntu repos
 - Non-invasive: Coexist with the already installed desktop environment
