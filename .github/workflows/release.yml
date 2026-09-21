@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    # Only files in the `dotfiles` directory are packaged for release.
+    paths:
+      - 'dotfiles/**'
   workflow_dispatch:
 
 jobs:
