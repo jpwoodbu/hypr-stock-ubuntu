@@ -35,6 +35,8 @@ KEY_MAP = {
     "XF86AudioPrev": "Media Prev",
     "XF86AudioPlay": "Media Play",
     "XF86AudioPause": "Media Pause",
+    "page_up": "Page Up",
+    "page_down": "Page Down",
 }
 
 
@@ -90,9 +92,10 @@ def sorting_priority(desc: str) -> int:
           Maximize, Splits)
       300-399: Window navigation, swapping & dragging (Focus, Directional move,
           Swap, Drag move/resize)
-      400-499: UI & aesthetics toggles (Borders/gaps, Waybar, Nightlight)
+      400-499: UI & aesthetics toggles (Borders/gaps, Waybar, Nightlight, Zoom)
       500-699: Workspaces & special workspaces (200-slot section: Workspace
-          switching 500-599, Move to workspace & scratchpad 600-699)
+          switching 500-599. Move to workspace, silent moves & scratchpad
+          600-699)
       700-799: Window grouping (Toggle group, Move in/out, Navigation,
           Switch group window 1-10)
       800-899: General unclassified keybinds (fallback: 800)
@@ -129,15 +132,22 @@ def sorting_priority(desc: str) -> int:
         (r"(?i)^(Move|Resize) window$", 340),
         # 400-499: UI & aesthetic toggles
         (r"(?i)borders|Waybar|night", 410),
+        (r"(?i)zoom", 420),
     ]
     # 500-699: Workspaces & special workspaces (200-slot range)
     # 500-599: Workspace navigation & switching
-    patterns.append((r"(?i)(Next|Previous) workspace", 500))
+    patterns.extend([
+        (r"(?i)Next workspace", 501),
+        (r"(?i)Previous workspace", 502),
+        (r"(?i)Former workspace", 503),
+    ])
     for i in range(1, 11):
         patterns.append((rf"^Workspace {i}$", 510 + i))
     # 600-699: Move to workspace & scratchpad
     for i in range(1, 11):
         patterns.append((rf"^Move to workspace {i}$", 610 + i))
+    for i in range(1, 11):
+        patterns.append((rf"^Move silently to workspace {i}$", 630 + i))
     patterns.extend([
         (r"(?i)scratchpad", 650),
         (r"(?i)workspace", 690),
@@ -156,9 +166,9 @@ def sorting_priority(desc: str) -> int:
         (r"(?i)Brightness", 920),
         (r"(?i)track|Play|Pause", 930),
     ])
-    for pat, prio in patterns:
-        if re.search(pat, desc):
-            return prio
+    for pattern, priority in patterns:
+        if re.search(pattern, desc):
+            return priority
     # Fallback for unclassified keybindings: places them after configured
     # categories but before hardware-specific keys.
     return 800
