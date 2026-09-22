@@ -110,6 +110,10 @@ def sorting_priority(desc: str) -> int:
     patterns: list[tuple[str, int]] = [
         # 1-99: Primary applications & launchers
         (r"(?i)Terminal", 10),
+        # This line needs to come before the "Browser" line so it matches
+        # earlier since the bind description for the incognito browser would
+        # match on the "Browser" line too.
+        (r"(?i)incognito", 25),
         (r"(?i)Browser", 20),
         (r"(?i)File manager", 30),
         (r"(?i)Application menu", 40),
