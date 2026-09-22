@@ -7,7 +7,8 @@ This is a guide for setting up [Hyprland](https://hypr.land/) on
 - Non-invasive: Coexist with the already installed desktop environment
 - Inspectable: Small config files and scripts
 - Low surface area: Configs only in your homedir with minimal exceptions
-- [Omarchy](https://omarchy.org/) hotkeys: Use the same keybindings as Omarchy
+- [Omarchy](https://omarchy.org/) hotkeys: Use a subset of the hotkeys from
+  Omarchy with few exceptions
 
 This guide aims to make it trivial to try out Hyprland on Ubuntu without
 disrupting your existing setup. And since the included config and scripts are
@@ -188,12 +189,17 @@ Hyprland, may want that too.
 
 I think their [hotkeys](https://omarchy.org/manual/hotkeys/) are
 well-thought-out. Since I might end up eventually switching to Omarchy, it makes
-sense to stick to (a subset of) their bindings.
+sense to stick to (a subset of) their hotkeys with a few exceptions. Hotkeys I
+likely won't import include:
 
-### Why is $x Omarchy hotkey missing?
-
-Most likely, I've not yet needed it so I haven't added it. I plan to eventually
-migrate every hotkey from Omarchy that is generally compatible with this setup.
+- **Application launchers**: Omarchy uses `Super + Shift + $x` for its
+  application launchers which pushes other things I care about more to
+  `Super + Ctrl` and I find `Super + Shift` a lot more comfortable. The
+  terminal, browser, and file manager hotkeys are set up, and that's all I need
+  for now considering how quick the app launcher and search are.
+- **Anything which adds more dependencies or heavy scripts**: To try to keep
+  this repo inspectable, I'm not likely to import heavier functionality that
+  either requires big scripts or applications (e.g. dictation, OCR).
 
 ### Why not use Universal Wayland Session Manager?
 
