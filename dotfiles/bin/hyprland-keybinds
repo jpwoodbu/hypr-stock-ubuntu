@@ -45,7 +45,7 @@ class Keybind:
     dispatcher: str
     arg: str
     mouse: bool
-    prio: float
+    sorting_priority: int
 
     @property
     def display_line(self) -> str:
@@ -78,61 +78,90 @@ def get_chord(modmask: int, key: str) -> str:
     return " + ".join(mods + [k]) if mods else k
 
 
-def get_prio(desc: str) -> float:
+def sorting_priority(desc: str) -> int:
     """Compute a sorting priority for a keybinding description.
 
     Lower priority numbers appear earlier in the menu list. Categories are
-    ordered as follows:
-      1-5: Primary applications & launchers (Terminal, Browser, Files, Menu)
-      6-8: System tools (Keybindings cheatsheet, Lock screen, Color picker)
-      9-15: Window management & navigation (Close, Float, Fullscreen,
-          Splits, Focus)
-      16-17: Workspaces & workspace switching
-      18-20: Scratchpad & window layout adjustments
-      25: General unclassified keybinds
-      30: Hardware keys (Volume, Brightness, Media playback)
+    ordered across a 1-1000 scale:
+      1-99: Primary applications & launchers (Terminal, Browser, Files, Menu)
+      100-199: System tools (Keybindings cheatsheet, Lock screen, Color picker,
+          Screenshot, Clipboard)
+      200-299: Window management & state controls (Close, Float, Fullscreen,
+          Maximize, Splits)
+      300-399: Window navigation, swapping & dragging (Focus, Directional move,
+          Swap, Drag move/resize)
+      400-499: UI & aesthetics toggles (Borders/gaps, Waybar, Nightlight)
+      500-699: Workspaces & special workspaces (200-slot section: Workspace
+          switching 500-599, Move to workspace & scratchpad 600-699)
+      700-799: Window grouping (Toggle group, Move in/out, Navigation,
+          Switch group window 1-10)
+      800-899: General unclassified keybinds (fallback: 800)
+      900-999: Hardware keys (Volume, Brightness, Media playback)
 
     Args:
         desc: Descriptive text of the keybinding action.
 
     Returns:
-        Floating-point priority value used for sorting.
+        Integer priority value used for sorting.
     """
-    # The second value in the tuple needs to be a float because some entries
-    # will be inserted into the list between other elements.
-    patterns: list[tuple[str, float]] = [
-        (r"(?i)Terminal", 1),
-        (r"(?i)Browser", 2),
-        (r"(?i)File manager", 3),
-        (r"(?i)Application menu", 4),
-        (r"(?i)System menu", 5),
-        (r"(?i)keybinding", 6),
-        (r"(?i)Lock screen", 7),
-        (r"(?i)Color picker", 8),
-        (r"(?i)Close active window", 9),
-        (r"(?i)Toggle floating|Pop out", 10),
-        (r"(?i)fullscreen|maximize", 11),
-        (r"(?i)split|pseudo", 12),
-        (r"(?i)Focus (next|previous)", 13),
-        (r"(?i)borders|Waybar|night", 14),
-        (r"(?i)Move focus", 15),
+    patterns: list[tuple[str, int]] = [
+        # 1-99: Primary applications & launchers
+        (r"(?i)Terminal", 10),
+        (r"(?i)Browser", 20),
+        (r"(?i)File manager", 30),
+        (r"(?i)Application menu", 40),
+        (r"(?i)System menu", 50),
+        # 100-199: System tools & utilities
+        (r"(?i)keybinding", 110),
+        (r"(?i)Lock screen", 120),
+        (r"(?i)Color picker", 130),
+        (r"(?i)Screenshot", 140),
+        (r"(?i)Clipboard", 150),
+        # 200-299: Window management & state controls
+        (r"(?i)Close active window", 210),
+        (r"(?i)Toggle floating|Pop out", 220),
+        (r"(?i)full\s*screen|maximize", 230),
+        (r"(?i)split|pseudo", 240),
+        # 300-399: Window navigation, swapping & dragging
+        (r"(?i)Focus (next|previous)", 310),
+        (r"(?i)Move focus", 320),
+        (r"(?i)Swap window", 330),
+        (r"(?i)^(Move|Resize) window$", 340),
+        # 400-499: UI & aesthetic toggles
+        (r"(?i)borders|Waybar|night", 410),
     ]
+    # 500-699: Workspaces & special workspaces (200-slot range)
+    # 500-599: Workspace navigation & switching
+    patterns.append((r"(?i)(Next|Previous) workspace", 500))
     for i in range(1, 11):
-        patterns.append((rf"^Workspace {i}$", 16 + i * 0.01))
-        patterns.append((rf"^Move to workspace {i}$", 17 + i * 0.01))
+        patterns.append((rf"^Workspace {i}$", 510 + i))
+    # 600-699: Move to workspace & scratchpad
+    for i in range(1, 11):
+        patterns.append((rf"^Move to workspace {i}$", 610 + i))
     patterns.extend([
-        (r"(?i)scratchpad", 18),
-        (r"(?i)Move window|Resize window", 19),
-        (r"(?i)workspace", 20),
-        (r"(?i)Volume|Mute|Brightness|track|Play", 30),
+        (r"(?i)scratchpad", 650),
+        (r"(?i)workspace", 690),
+        # 700-799: Window grouping
+        (r"(?i)Toggle window grouping", 710),
+        (r"(?i)Move active window out of group", 720),
+        (r"(?i)Move window to group", 730),
+        (r"(?i)(Next|Previous) window in group", 740),
+        (r"(?i)Move window in group", 750),
+    ])
+    for i in range(1, 11):
+        patterns.append((rf"^Switch to group window {i}$", 760 + i))
+    patterns.extend([
+        # 900-999: Hardware keys
+        (r"(?i)Volume|Mute", 910),
+        (r"(?i)Brightness", 920),
+        (r"(?i)track|Play|Pause", 930),
     ])
     for pat, prio in patterns:
         if re.search(pat, desc):
             return prio
-    # Return 25.0 as a fallback for unclassified keybindings.  This
-    # ensures they appear after primary categories (1-20) but before
-    # hardware-specific keys (30).
-    return 25.0
+    # Fallback for unclassified keybindings: places them after configured
+    # categories but before hardware-specific keys.
+    return 800
 
 
 def load_keybinds() -> list[Keybind]:
@@ -152,7 +181,7 @@ def load_keybinds() -> list[Keybind]:
         print(f"Error querying hyprctl binds: {e}", file=sys.stderr)
         return []
 
-    items = []
+    items: list[Keybind] = []
     seen = set()
 
     for b in raw:
@@ -179,11 +208,11 @@ def load_keybinds() -> list[Keybind]:
                 dispatcher=disp,
                 arg=arg,
                 mouse=b.get("mouse", False),
-                prio=get_prio(desc),
+                sorting_priority=sorting_priority(desc),
             )
         )
 
-    items.sort(key=lambda x: (x.prio, x.chord))
+    items.sort(key=lambda x: (x.sorting_priority, x.chord))
     return items
 
 
