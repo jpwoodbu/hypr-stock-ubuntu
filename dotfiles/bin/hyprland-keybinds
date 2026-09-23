@@ -130,14 +130,14 @@ def sorting_priority(desc: str) -> int:
         (r"(?i)Close active window", 210),
         (r"(?i)Toggle floating|Pop out", 220),
         (r"(?i)full\s*screen|maximize", 230),
-        (r"(?i)split|pseudo", 240),
+        (r"(?i)Toggle (split|pseudo)", 240),
         # 300-399: Window navigation, swapping & dragging
         (r"(?i)Focus (next|previous)", 310),
         (r"(?i)Move focus", 320),
         (r"(?i)Swap window", 330),
-        (r"(?i)^(Move|Resize) window$", 340),
-            (r"(?i)(Expand|Shrink) window", 350),
-            # 400-499: UI & aesthetic toggles
+        (r"(?i)(Expand|Shrink) window", 350),
+        (r"(?i)Reset window split", 355),
+        # 400-499: UI & aesthetic toggles
         (r"(?i)borders|Waybar|night", 410),
         (r"(?i)zoom", 420),
     ]
