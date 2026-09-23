@@ -37,6 +37,8 @@ KEY_MAP = {
     "XF86AudioPause": "Media Pause",
     "page_up": "Page Up",
     "page_down": "Page Down",
+    "minus": "Minus",
+    "equal": "Equal",
 }
 
 
@@ -90,8 +92,8 @@ def sorting_priority(desc: str) -> int:
           Screenshot, Clipboard)
       200-299: Window management & state controls (Close, Float, Fullscreen,
           Maximize, Splits)
-      300-399: Window navigation, swapping & dragging (Focus, Directional move,
-          Swap, Drag move/resize)
+      300-399: Window navigation, swapping, dragging & resizing (Focus,
+          Directional move, Swap, Drag move/resize)
       400-499: UI & aesthetics toggles (Borders/gaps, Waybar, Nightlight, Zoom)
       500-699: Workspaces & special workspaces (200-slot section: Workspace
           switching 500-599. Move to workspace, silent moves & scratchpad
@@ -134,7 +136,8 @@ def sorting_priority(desc: str) -> int:
         (r"(?i)Move focus", 320),
         (r"(?i)Swap window", 330),
         (r"(?i)^(Move|Resize) window$", 340),
-        # 400-499: UI & aesthetic toggles
+            (r"(?i)(Expand|Shrink) window", 350),
+            # 400-499: UI & aesthetic toggles
         (r"(?i)borders|Waybar|night", 410),
         (r"(?i)zoom", 420),
     ]
@@ -252,13 +255,13 @@ def execute_keybind(bind: Keybind) -> None:
     time.sleep(0.05)
 
     if bind.dispatcher == "cyclenext":
-        cmd = ["hyprctl", "dispatch", "cyclenext"]
+        cmd = ["hyprctl", "--", "dispatch", "cyclenext"]
         if bind.arg:
             cmd.append(bind.arg)
         subprocess.run(cmd)
-        subprocess.run(["hyprctl", "dispatch", "bringactivetotop"])
+        subprocess.run(["hyprctl", "--", "dispatch", "bringactivetotop"])
     else:
-        cmd = ["hyprctl", "dispatch", bind.dispatcher]
+        cmd = ["hyprctl", "--", "dispatch", bind.dispatcher]
         if bind.arg:
             cmd.append(bind.arg)
         subprocess.run(cmd)
@@ -314,6 +317,8 @@ def main() -> None:
         "--width", "50%",
         "--insensitive",
         "--no-custom-entry",
+        # Don't let wofi's cache influence our carefully sorted keybinds.
+        "--cache-file", "/dev/null",
     ])
 
     try:
