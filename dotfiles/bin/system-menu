@@ -13,12 +13,14 @@ fi
 options=$'\tLock\n\tSuspend\n\tLog Out\n\tReboot\n\tShut Down'
 
 # Launch wofi in dmenu mode with a compact, centered layout.
-# Height fits 5 rows without scrolling; update if options change.
+# --height fits 5 rows without scrolling; update if options change.
+# --cache-file=/dev/null keeps the original sorting.
 choice=$(printf '%s\n' "$options" | wofi --dmenu \
     --hide-search \
     --width 200 \
     --height 237 \
     --location center \
+    --cache-file /dev/null \
     --hide-scroll || true)  # cancelling the menu yields a non-zero return code
 
 case "$choice" in
