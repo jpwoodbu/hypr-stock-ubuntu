@@ -52,9 +52,10 @@ Copy the files into their canonical paths:
 ```sh
 cd dotfiles
 mkdir -p ~/.local/bin
-mkdir -p ~/.config
+mkdir -p ~/.config/systemd/user
 cp -i bin/* ~/.local/bin
 cp -ir foot hypr waybar wofi ~/.config
+cp -ir systemd/user/* ~/.config/systemd/user
 ```
 
 Here are the few changes needed under `/etc`:
@@ -71,6 +72,12 @@ Reload `systemd-logind`:
 
 ```sh
 sudo systemctl reload systemd-logind
+```
+
+Have `systemd` pickup the new user unit for `swayosd-server`:
+
+```sh
+sudo systemctl --user daemon-reload
 ```
 
 Logout and log back in, choosing the Hyprland session option from the gear icon
