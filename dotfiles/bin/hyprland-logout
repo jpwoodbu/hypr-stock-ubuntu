@@ -64,7 +64,12 @@ if [ ${#TARGET_PIDS[@]} -gt 0 ]; then
 fi
 
 # Stop services cleanly so they don't segfault or rapid-restart on socket loss.
-systemctl --user stop hyprpolkitagent.service xdg-desktop-portal-hyprland.service xdg-desktop-portal.service 2>/dev/null || true
+systemctl --user stop \
+    xdg-desktop-portal-hyprland.service \
+    xdg-desktop-portal.service \
+    swayosd-server.service \
+    hyprpolkitagent.service \
+    2>/dev/null || true
 
 # Terminate Hyprland session.
 hyprctl dispatch exit
