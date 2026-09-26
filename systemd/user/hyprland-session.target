@@ -1,0 +1,9 @@
+[Unit]
+Description=Hyprland compositor session
+Documentation=https://wiki.hyprland.org
+BindsTo=graphical-session.target
+
+# These services do not need to be enabled with `systemctl --user enable`.
+# They are automatically activated whenever this target starts because they
+# are listed in this `Wants` directive.
+Wants=swayosd-server.service hyprpolkitagent.service waybar.service hyprpaper.service hypridle.service cliphist.service

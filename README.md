@@ -40,6 +40,14 @@ Install the packages:
 sudo apt update && sudo apt install hyprland hypridle hyprlock hyprpaper hyprpolkitagent hyprpicker waybar wofi swayosd foot wlsunset jq fonts-font-awesome brightnessctl playerctl wl-clipboard cliphist
 ```
 
+Disable globally enabled `systemd` services since they will be managed by the
+Hyprland session service (started in `hyprland.conf`) **and** so they will not
+start in a GNOME session:
+
+```sh
+sudo systemctl --global disable hypridle.service hyprpaper.service hyprpolkitagent.service waybar.service
+```
+
 Download and extract the latest **hypr-stock-ubuntu** dotfiles release:
 
 ```sh
@@ -74,7 +82,7 @@ Reload `systemd-logind`:
 sudo systemctl reload systemd-logind
 ```
 
-Have `systemd` pickup the new user unit for `swayosd-server`:
+Have `systemd` pickup the new user units:
 
 ```sh
 systemctl --user daemon-reload
