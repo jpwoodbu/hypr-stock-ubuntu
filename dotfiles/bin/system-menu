@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Keyboard-driven system power menu for Hyprland using wofi
+# Keyboard-driven system power menu for Hyprland using wofi.
 
 set -euo pipefail
 
-# Toggle behavior: if wofi is already running, close it
+# Toggle behavior: if wofi is already running, close it.
 if pidof wofi >/dev/null 2>&1; then
     killall wofi
     exit 0

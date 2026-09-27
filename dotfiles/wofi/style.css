@@ -10,7 +10,7 @@
 }
 
 #input {
-    /* 0px margin on the bottom of the input element becauase the scroll section
+    /* 0px margin on the bottom of the input element because the scroll section
      * directly below already has a top/bottom margin. */
     margin: 16px 16px 0px 16px;
     padding: 10px 16px;

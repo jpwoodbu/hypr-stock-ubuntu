@@ -203,7 +203,8 @@ def load_keybinds() -> list[Keybind]:
 
     for b in raw:
         disp = b.get("dispatcher", "")
-        # Filter out secondary helper dispatchers that duplicate a primary bind
+        # Filter out the secondary helper dispatchers that duplicate a primary
+        # bind.
         if disp == "bringactivetotop":
             continue
 
@@ -246,7 +247,7 @@ def execute_keybind(bind: Keybind) -> None:
         bind: The Keybind instance to execute.
     """
     # Mouse-drag actions require physical cursor motion and cannot be triggered
-    # via key press
+    # via key press.
     if bind.mouse:
         return
 
@@ -278,7 +279,7 @@ def main() -> None:
     print_mode = any(arg in sys.argv[1:] for arg in ("--print", "-p"))
 
     if not print_mode:
-        # Toggle behavior: if wofi is already running, close it
+        # Toggle behavior: if wofi is already running, close it.
         if (
             subprocess.run(
                 ["pidof", "wofi"],
@@ -337,7 +338,7 @@ def main() -> None:
         sys.exit(1)
 
     if result.returncode != 0:
-        # User cancelled (e.g. Esc or clicked outside)
+        # The user cancelled (e.g. Esc or clicked outside).
         sys.exit(0)
 
     selected = result.stdout.strip()

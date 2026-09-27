@@ -11,10 +11,10 @@
 
 set -euo pipefail
 
-# Query the active window info via Hyprland IPC
+# Query the active window info via Hyprland IPC.
 window_json=$(hyprctl activewindow -j)
 
-# Exit gracefully if no window is active
+# Exit gracefully if no window is active.
 if [[ -z "$window_json" || "$window_json" == "{}" ]]; then
     exit 0
 fi
@@ -30,19 +30,21 @@ fi
 state_file="/tmp/hypr-pop-${address}.split"
 
 if [[ "$is_floating" == "true" ]]; then
-    # Window is currently popped/floating: unpin and return to tiled mode
+    # Window is currently popped/floating: unpin and return to tiled mode.
     batch="dispatch settiled"
     if [[ "$is_pinned" == "true" ]]; then
         batch="dispatch pin ; $batch"
     fi
-    # If the window was previously in a horizontal (top/bottom) split, restore it
+    # If the window was previously in a horizontal (top/bottom) split, restore
+    # it.
     if [[ -f "$state_file" ]]; then
         batch="$batch ; dispatch togglesplit"
         rm -f "$state_file" 2>/dev/null || true
     fi
     hyprctl --batch "$batch"
 else
-    # Check if this window is currently in a horizontal (top/bottom) split with other tiled windows.
+    # Check if this window is currently in a horizontal (top/bottom) split with
+    # other tiled windows.
     # In dwindle layout on widescreen displays:
     # - side-by-side windows have width < height (columns)
     # - top-and-bottom windows have width > height (rows)
@@ -53,6 +55,7 @@ else
         rm -f "$state_file" 2>/dev/null || true
     fi
 
-    # Window is tiled: float, resize to 80%x80%, center (respecting bar), and pin
+    # Window is tiled: float, resize to 80%x80%, center (respecting bar), and
+    # pin.
     hyprctl --batch "dispatch setfloating ; dispatch resizeactive exact 80% 80% ; dispatch centerwindow 1 ; dispatch pin"
 fi
