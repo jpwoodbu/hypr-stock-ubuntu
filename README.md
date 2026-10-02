@@ -116,13 +116,13 @@ in the bottom right. The first thing you should do when logging in is try the
 
 ## Scripts and how each one is used
 
-| Script                | Description                                                                  |
-| :-------------------- | :--------------------------------------------------------------------------- |
-| `hyprland-keybinds`   | Shows a dynamic menu of keybindings based on the running Hyprland config.    |
-| `hyprland-logout`     | Tries to gracefully shutdown session processes in the right order on logout. |
-| `hyprland-window-pop` | Manages the logic of popping out windows (`SUPER + O`).                      |
-| `nightlightctl`       | Controls the blue light filter. Used by the Waybar and in a keybinding.      |
-| `system-menu`         | Shows a menu of actions like lock, suspend, reboot, etc.                     |
+| Script                 | Description                                                                                        |
+| :--------------------- | :------------------------------------------------------------------------------------------------- |
+| `hyprland-keybinds`    | Shows a dynamic menu of keybindings based on the running Hyprland config.                          |
+| `hyprland-end-session` | Tries to gracefully shutdown session processes in the right order on logout, reboot, and shutdown. |
+| `hyprland-window-pop`  | Manages the logic of popping out windows (`SUPER + O`).                                            |
+| `nightlightctl`        | Controls the blue light filter. Used by the Waybar and in a keybinding.                            |
+| `system-menu`          | Shows a menu of actions like lock, suspend, reboot, etc.                                           |
 
 ## Extras
 

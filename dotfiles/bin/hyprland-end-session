@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Gracefully signal active Wayland clients, layers, and daemons before exiting
-# Hyprland.
+# Gracefully signal active Wayland clients and daemons before ending the
+# Hyprland session (logout, reboot, or shutdown).
 
 set -euo pipefail
 
@@ -10,12 +10,36 @@ TIMEOUT_MS=2500
 # exited.
 INTERVAL=0.05
 
-# Blank the display immediately for instant, seamless visual feedback.
-hyprctl dispatch dpms off 2>/dev/null || true
+usage() {
+    echo "Usage: $(basename "$0") [logout|reboot|shutdown|poweroff]" >&2
+    exit 1
+}
+
+# Require an action argument or default to logout if omitted.
+ACTION="${1:-logout}"
+
+case "$ACTION" in
+    logout|reboot|shutdown|poweroff)
+        ;;
+    -h|--help)
+        usage
+        ;;
+    *)
+        echo "Error: Unknown action '$ACTION'." >&2
+        usage
+        ;;
+esac
+
+# Blank the display immediately on logout only. GDM will turn on the display
+# when it takes over. For reboot and shutdown, leave the display on so that any
+# progress systemd displays is still visible.
+if [ "$ACTION" = "logout" ]; then
+    hyprctl dispatch dpms off 2>/dev/null || true
+fi
 
 # Collect all active client PIDs recursively from Hyprland IPC.
 # The hyprctl/jq stage is failure-tolerant so a dead compositor socket
-# degrades to an empty PID list instead of aborting the logout.
+# degrades to an empty PID list instead of aborting the session end.
 mapfile -t IPC_PIDS < <(
     hyprctl clients -j 2>/dev/null | jq -r '.. | .pid? // empty' 2>/dev/null | sort -u || true
 )
@@ -60,8 +84,19 @@ if [ ${#TARGET_PIDS[@]} -gt 0 ]; then
     done
 fi
 
-# Stop session targets. hyprland-session.target is started in hyprland.conf.
-systemctl --user stop hyprland-session.target graphical-session.target 2>/dev/null || true
-
-# Terminate Hyprland session.
-hyprctl dispatch exit
+# Execute the requested session termination action.
+case "$ACTION" in
+    logout)
+        # Stop session targets so background user services shut down cleanly.
+        # This is started in hyprland.conf and only needs explicit stopping on
+        # logout; reboot and shutdown stop all user targets implicitly.
+        systemctl --user stop hyprland-session.target graphical-session.target 2>/dev/null || true
+        hyprctl dispatch exit
+        ;;
+    reboot)
+        systemctl reboot
+        ;;
+    shutdown|poweroff)
+        systemctl poweroff
+        ;;
+esac

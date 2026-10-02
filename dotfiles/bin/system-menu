@@ -33,12 +33,12 @@ case "$choice" in
         systemctl suspend
         ;;
     *"Log Out"*)
-        ~/.local/bin/hyprland-logout
+        ~/.local/bin/hyprland-end-session logout
         ;;
     *"Reboot"*)
-        systemctl reboot
+        ~/.local/bin/hyprland-end-session reboot
         ;;
     *"Shut Down"*)
-        systemctl poweroff
+        ~/.local/bin/hyprland-end-session shutdown
         ;;
 esac
