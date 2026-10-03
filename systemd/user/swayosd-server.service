@@ -14,6 +14,11 @@ After=pipewire.service pipewire-pulse.service wireplumber.service
 Wants=pipewire.service pipewire-pulse.service wireplumber.service
 PartOf=hyprland-session.target
 After=hyprland-session.target
+# Not starting unless `WAYLAND_DISPLAY` is set prevents `swayosd-server` from
+# falling back to `wayland-0` and becoming unresponsive if started outside a
+# Wayland session.  Better to have `systemd` show a failed start rather than an
+# apparent success state with the service silently broken.
+ConditionEnvironment=WAYLAND_DISPLAY
 
 [Service]
 Type=simple
