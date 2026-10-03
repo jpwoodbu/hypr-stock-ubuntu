@@ -132,7 +132,7 @@ If you don't want to see a title bar in your installed web apps, go into
 `~/.local/share/applications`, find the `.desktop` file for the installed web
 app and on the `Exec` line, add the `--app="<URL>"` flag to the command line.
 For example, if you installed Discord, run `grep -il discord *` to find the
-right file, open it, and add `--app="https://discord.com/app"
+right file, open it, and add `--app="https://discord.com/app"`.
 
 ### Google Calendar integration
 
