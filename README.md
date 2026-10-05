@@ -72,7 +72,7 @@ Here are the few changes needed under `/etc`:
   caps lock is rebound to be an additional `SUPER` key in my `hyprland.conf`.
 - In `/etc/systemd/logind.conf` set `HoldoffTimeoutSec=0s`. This will not
   interfere with GNOME (KDE not tested) as GNOME takes over this functionality
-  from systemd completely. Without this change, your Hyprland session will not
+  from `systemd` completely. Without this change, your Hyprland session will not
   suspend or **lock** if you close the lid on the machine within 30s of a wake,
   reboot, or power on.
 

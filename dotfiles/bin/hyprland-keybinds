@@ -12,7 +12,6 @@ import sys
 import time
 from dataclasses import dataclass
 
-
 KEY_MAP = {
     "mouse:272": "LMB (Drag)",
     "mouse:273": "RMB (Drag)",
@@ -143,11 +142,13 @@ def sorting_priority(desc: str) -> int:
     ]
     # 500-699: Workspaces & special workspaces (200-slot range)
     # 500-599: Workspace navigation & switching
-    patterns.extend([
-        (r"(?i)Next workspace", 501),
-        (r"(?i)Previous workspace", 502),
-        (r"(?i)Former workspace", 503),
-    ])
+    patterns.extend(
+        [
+            (r"(?i)Next workspace", 501),
+            (r"(?i)Previous workspace", 502),
+            (r"(?i)Former workspace", 503),
+        ]
+    )
     for i in range(1, 11):
         patterns.append((rf"^Workspace {i}$", 510 + i))
     # 600-699: Move to workspace & scratchpad
@@ -155,24 +156,28 @@ def sorting_priority(desc: str) -> int:
         patterns.append((rf"^Move to workspace {i}$", 610 + i))
     for i in range(1, 11):
         patterns.append((rf"^Move silently to workspace {i}$", 630 + i))
-    patterns.extend([
-        (r"(?i)scratchpad", 650),
-        (r"(?i)workspace", 690),
-        # 700-799: Window grouping
-        (r"(?i)Toggle window grouping", 710),
-        (r"(?i)Move active window out of group", 720),
-        (r"(?i)Move window to group", 730),
-        (r"(?i)(Next|Previous) window in group", 740),
-        (r"(?i)Move window in group", 750),
-    ])
+    patterns.extend(
+        [
+            (r"(?i)scratchpad", 650),
+            (r"(?i)workspace", 690),
+            # 700-799: Window grouping
+            (r"(?i)Toggle window grouping", 710),
+            (r"(?i)Move active window out of group", 720),
+            (r"(?i)Move window to group", 730),
+            (r"(?i)(Next|Previous) window in group", 740),
+            (r"(?i)Move window in group", 750),
+        ]
+    )
     for i in range(1, 11):
         patterns.append((rf"^Switch to group window {i}$", 760 + i))
-    patterns.extend([
-        # 900-999: Hardware keys
-        (r"(?i)Volume|Mute", 910),
-        (r"(?i)Brightness", 920),
-        (r"(?i)track|Play|Pause", 930),
-    ])
+    patterns.extend(
+        [
+            # 900-999: Hardware keys
+            (r"(?i)Volume|Mute", 910),
+            (r"(?i)Brightness", 920),
+            (r"(?i)track|Play|Pause", 930),
+        ]
+    )
     for pattern, priority in patterns:
         if re.search(pattern, desc):
             return priority
@@ -312,6 +317,7 @@ def main() -> None:
     if css_path.exists():
         wofi_cmd.extend(["--style", str(css_path)])
 
+    # fmt: off
     wofi_cmd.extend([
         "--prompt", "Keybindings",
         "--location", "center",
@@ -321,6 +327,7 @@ def main() -> None:
         # Don't let wofi's cache influence our carefully sorted keybinds.
         "--cache-file", "/dev/null",
     ])
+    # fmt: on
 
     try:
         result = subprocess.run(
@@ -348,7 +355,6 @@ def main() -> None:
     bind = binds_by_display.get(selected)
     if bind:
         execute_keybind(bind)
-
 
 
 if __name__ == "__main__":
