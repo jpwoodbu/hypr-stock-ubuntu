@@ -103,7 +103,8 @@ tooltip label {
 }
 
 #bluetooth.off,
-#bluetooth.disabled {
+#bluetooth.disabled,
+#bluetooth.no-controller {
     min-width: 0;
     padding: 0;
     margin: 0;
