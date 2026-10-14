@@ -10,8 +10,12 @@ Documentation=https://github.com/ErikReider/SwayOSD
 # levels via `libpulse` in response to client requests. It must start after
 # `pipewire.service`, `pipewire-pulse.service`, and `wireplumber.service` so
 # that the audio routing daemon and hardware endpoints are fully initialized.
-After=pipewire.service pipewire-pulse.service wireplumber.service
-Wants=pipewire.service pipewire-pulse.service wireplumber.service
+#
+# It must also start after `xdg-desktop-portal.service` so that the desktop
+# portal and its backend implementations are ready when GTK initializes,
+# preventing D-Bus activation hangs.
+After=pipewire.service pipewire-pulse.service wireplumber.service xdg-desktop-portal.service
+Wants=pipewire.service pipewire-pulse.service wireplumber.service xdg-desktop-portal.service
 PartOf=hyprland-session.target
 After=hyprland-session.target
 # Not starting unless `WAYLAND_DISPLAY` is set prevents `swayosd-server` from
