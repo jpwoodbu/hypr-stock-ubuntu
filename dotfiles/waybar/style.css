@@ -95,7 +95,8 @@ tooltip label {
 #battery,
 #power-profiles-daemon,
 #custom-nightlight,
-#bluetooth {
+#bluetooth,
+#idle_inhibitor {
     padding: 0 10px;
     margin: 4px 0;
     background-color: rgba(255, 255, 255, 0.1);
@@ -115,6 +116,14 @@ tooltip label {
 }
 
 #custom-nightlight.inactive {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+#idle_inhibitor.activated {
+    color: #ffffff;
+}
+
+#idle_inhibitor.deactivated {
     color: rgba(255, 255, 255, 0.55);
 }
 
@@ -152,7 +161,8 @@ tooltip label {
 #battery:hover,
 #power-profiles-daemon:hover,
 #custom-nightlight:hover,
-#bluetooth:hover {
+#bluetooth:hover,
+#idle_inhibitor:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 

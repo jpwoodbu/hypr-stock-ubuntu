@@ -14,6 +14,7 @@
         "tray",
         "pulseaudio",
         "custom/nightlight",
+        "idle_inhibitor",
         "power-profiles-daemon",
         "bluetooth",
         "network",
@@ -103,5 +104,16 @@
         "on-click": "~/.local/bin/nightlightctl",
         "signal": 8,
         "tooltip": true
+    },
+
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        },
+        "tooltip": true,
+        "tooltip-format-activated": "Idle inhibitor: active",
+        "tooltip-format-deactivated": "Idle inhibitor: inactive"
     }
 }
