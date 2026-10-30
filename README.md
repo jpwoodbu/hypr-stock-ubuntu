@@ -172,6 +172,35 @@ Using the GNOME control center to manage things like WiFi and audio is
 functional, if clunky, but the Bluetooth controls from the GNOME control center
 do not work when in a Hyprland session.
 
+### Fingerprint unlock contention with pam_fprintd
+
+The included `hyprlock.conf` file enables native fingerprint scanning. On
+Ubuntu, the stock `/etc/pam.d/hyprlock` configuration delegates to `login`,
+which pulls in `common-auth`. When `fprintd` is installed, `pam-auth-update`
+places `pam_fprintd.so` at the top of `common-auth`.
+
+This causes both `hyprlock`'s native D-Bus integration and the PAM stack to
+compete for the fingerprint reader simultaneously. Especially across
+suspend/resume cycles, this contention can cause fingerprint reader claim
+failures, making the fingerprint prompt on the lock screen not appear and
+delaying password authentication behind PAM's fingerprint timeout.
+
+To avoid this contention, configure `/etc/pam.d/hyprlock` to handle password
+authentication directly without invoking `pam_fprintd`:
+
+```pam
+# hyprlock's native `fprintd` integration handles fingerprint unlock in parallel
+# with this stack, so `pam_fprintd` is intentionally omitted to avoid both
+# clients contending for the fingerprint reader. The rest mirrors the `auth`
+# stack that the stock `auth include login` pulled in via `common-auth`.
+
+auth    optional                        pam_faildelay.so delay=3000000
+auth    [success=2 default=ignore]      pam_unix.so nullok
+auth    [success=1 default=ignore]      pam_sss.so use_first_pass
+auth    requisite                       pam_deny.so
+auth    required                        pam_permit.so
+```
+
 ## FAQ
 
 - [Why Hyprland?](#why-hyprland)
